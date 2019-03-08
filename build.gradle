@@ -58,8 +58,8 @@ project(":core") {
     dependencies {
         compileOnly group: 'junit', name: 'junit', version: '4.12'
         compileOnly 'org.projectlombok:lombok:1.18.4'
-        compileOnly group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
-        compileOnly group: 'org.mockito', name: 'mockito-core', version: '2.23.4'
+        compileOnly 'org.assertjassertj-core3.11.1'
+        compileOnly 'org.mockitomockito-core2.23.4'
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     }
