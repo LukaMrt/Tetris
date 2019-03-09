@@ -1,6 +1,7 @@
 package fr.luka.tetris.model;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import lombok.Getter;
 
 public class Square {
@@ -30,4 +31,15 @@ public class Square {
 
     }
 
+    public void update(Array<Square> gameSquares) {
+
+        rectangle.setY(rectangle.getY() - 32);
+
+        for (Square square : gameSquares) {
+            if (rectangle.overlaps(square.getRectangle())) {
+                rectangle.setY(rectangle.getY() + 32);
+            }
+        }
+
+    }
 }
