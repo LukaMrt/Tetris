@@ -145,9 +145,10 @@ public class Tetris extends ApplicationAdapter {
 
             if (entry.getValue().equals(16)) {
 
-                squares.select(square -> square.getRectangle().getY() == entry.getValue()).forEach(square -> squares.removeIndex(squares.indexOf(square, false)));
+                squares.select(square -> square.getRectangle().getY() == entry.getKey()).forEach(square -> squares.removeIndex(squares.indexOf(square, false)));
 
-                for (Square square : squares) {
+                for (int i = 0; i < squares.size; i++) {
+                    Square square = squares.get(i);
                     square.update(squares);
                 }
 
