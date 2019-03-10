@@ -96,11 +96,6 @@ com_crashlytics_export_strings.xml
 nbactions.xml
 nb-configuration.xml
 
-## Gradle
-
-/local.properties
-.gradle/
-
 ## OS Specific
 .DS_Store
 Thumbs.db
