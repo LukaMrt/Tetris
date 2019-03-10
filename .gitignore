@@ -96,12 +96,6 @@ com_crashlytics_export_strings.xml
 nbactions.xml
 nb-configuration.xml
 
-## Gradle
-
-/local.properties
-.gradle/
-gradle-app.setting
-
 ## OS Specific
 .DS_Store
 Thumbs.db
@@ -116,5 +110,3 @@ Thumbs.db
 !/ios-moe/xcode/*.xcodeproj/xcshareddata
 !/ios-moe/xcode/*.xcodeproj/project.pbxproj
 /ios-moe/xcode/native/
-
-test

@@ -1,14 +1,14 @@
 package fr.luka.tetris.model.blocks;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import lombok.Getter;
 
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public abstract class Block {
@@ -58,7 +58,9 @@ public abstract class Block {
 
             square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? -32 : 32));
 
-            cantMove = cancelMove(square, gameSquares);
+            if (cancelMove(square, gameSquares)) {
+                cantMove = true;
+            }
 
         }
 
@@ -72,8 +74,20 @@ public abstract class Block {
 
     public void turn(Array<Square> gameSquares) {
 
-        Sort.instance().sort(squares, (o1, o2) -> {
-            if (o1.getRectangle().getX() < o2.getRectangle().getX() && o1.getRectangle().getY() < o2.getRectangle().getY()) {
+        Array<Square> rowsSort = new Array<>(squares);
+
+        Sort.instance().sort(rowsSort, (o1, o2) -> {
+            if (o1.getRectangle().getY() < o2.getRectangle().getY()) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+
+        Array<Square> colSort = new Array<>(squares);
+
+        Sort.instance().sort(colSort, (o1, o2) -> {
+            if (o1.getRectangle().getX() < o2.getRectangle().getX()) {
                 return -1;
             } else {
                 return 1;
@@ -89,35 +103,29 @@ public abstract class Block {
             }
         }
 
-        Array<Float> columns = new Array<>();
-
-        for (Square square : squares) {
-            float x = square.getRectangle().getX();
-            if (!rows.contains(x, false)) {
-                rows.add(square.getRectangle().getX());
-            }
-        }
-
-        float moyenX = columns.size % 2 == 0 ? columns.size / 2 : columns.size / 2 - 0.5f;
-        float moyenY = rows.size % 2 == 0 ? rows.size / 2 : rows.size / 2 - 0.5f;
-
-        float originX = squares.get(0).getRectangle().getX() + (moyenX * 32);
-        float originY = squares.get(0).getRectangle().getY() + (moyenY * 32);
+        float originX = colSort.get(0).getRectangle().getX();
+        float originY = rowsSort.get(0).getRectangle().getY();
 
         boolean cantTurn = false;
 
+        Map<Square, Rectangle> map = new HashMap<>();
+
         for (Square square : squares) {
+
+            map.put(square, new Rectangle(square.getRectangle()));
 
             float row = (square.getRectangle().getY() - originY) / 32;
             float column = (square.getRectangle().getX() - originX) / 32;
 
-            float newRow = (column * 32 + originY);
-            float newColumn = ((columns.size - (row + 1)) * 32 + originX);
+            float newRow = column;
+            float newColumn = rows.size - (row + 1);
 
-            square.getRectangle().setY(newRow);
-            square.getRectangle().setX(newColumn);
+            square.getRectangle().setY(originY + (newRow * 32));
+            square.getRectangle().setX(originX + (newColumn * 32));
 
-            cantTurn = cancelMove(square, gameSquares);
+            if (cancelMove(square, gameSquares)) {
+                cantTurn = true;
+            }
 
         }
 
@@ -125,7 +133,7 @@ public abstract class Block {
 
             for (Square square : squares ) {
 
-
+                square.setRectangle(map.get(square));
 
             }
 
@@ -137,7 +145,7 @@ public abstract class Block {
 
         float x = square.getRectangle().getX();
 
-        if (x < 0 || x > 512 - 32) {
+        if (x < 0 || x >= 512) {
             return true;
         }
 
@@ -151,4 +159,7 @@ public abstract class Block {
 
     }
 
+    public Array<Square> getSquares() {
+        return squares;
+    }
 }

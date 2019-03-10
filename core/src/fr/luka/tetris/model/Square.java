@@ -3,10 +3,12 @@ package fr.luka.tetris.model;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import lombok.Getter;
+import lombok.Setter;
 
 public class Square {
 
     @Getter
+    @Setter
     private Rectangle rectangle;
 
     public Square(int x, int y) {
@@ -33,13 +35,23 @@ public class Square {
 
     public void update(Array<Square> gameSquares) {
 
-        rectangle.setY(rectangle.getY() - 32);
+        float origin = rectangle.getY();
+        rectangle.setY(origin - 32);
 
-        for (Square square : gameSquares) {
-            if (rectangle.overlaps(square.getRectangle())) {
-                rectangle.setY(rectangle.getY() + 32);
+        gameSquares.forEach(square -> {
+            if (rectangle.overlaps(square.getRectangle()) && !square.equals(this)) {
+                rectangle.setY(origin);
             }
-        }
+        });
 
     }
+
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public void setRectangle(Rectangle rectangle) {
+        this.rectangle = rectangle;
+    }
+
 }

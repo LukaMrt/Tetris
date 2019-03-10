@@ -6,19 +6,18 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.Sort;
 import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
-import fr.luka.tetris.model.blocks.Block;
-import fr.luka.tetris.model.blocks.Block1;
-import fr.luka.tetris.model.blocks.Block3;
-import fr.luka.tetris.model.blocks.Block4;
+import fr.luka.tetris.model.blocks.*;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Tetris extends ApplicationAdapter {
@@ -86,7 +85,27 @@ public class Tetris extends ApplicationAdapter {
 
     private void updateBlock() {
         if (block == null) {
-            block = new Block4();
+
+            switch (MathUtils.random(0, 3)) {
+
+                case 0:
+                    block = new Block1();
+                    break;
+
+                case 1:
+                    block = new Block2();
+                    break;
+
+                case 2:
+                    block = new Block3();
+                    break;
+
+                case 3:
+                    block = new Block4();
+                    break;
+
+            }
+
             lastBlockFall = TimeUtils.millis();
         }
     }
@@ -95,17 +114,17 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownMove + 200) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
                 block.move(Direction.LEFT, squares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
                 block.move(Direction.RIGHT, squares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
                 block.turn(squares);
                 coolDownMove = TimeUtils.millis();
             }
@@ -114,7 +133,7 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownFall + 75) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
                 fallBlock();
                 coolDownFall = TimeUtils.millis();
             }
@@ -125,7 +144,7 @@ public class Tetris extends ApplicationAdapter {
 
     private void checksRows() {
 
-        Sort.instance().sort(squares, (o1, o2) -> Float.compare(01, 02));
+        Sort.instance().sort(squares, (o1, o2) -> Float.compare(o1.getRectangle().getY(), o2.getRectangle().getY()));
 
         HashMap<Float, Integer> map = new HashMap<>();
 
@@ -145,7 +164,14 @@ public class Tetris extends ApplicationAdapter {
 
             if (entry.getValue().equals(16)) {
 
-                squares.select(square -> square.getRectangle().getY() == entry.getKey()).forEach(square -> squares.removeIndex(squares.indexOf(square, false)));
+                System.out.println("ok");
+
+                for (Iterator<Square> iterator = squares.iterator(); iterator.hasNext(); ) {
+                    Square square = iterator.next();
+                    if (square.getRectangle().getY() == entry.getKey()) {
+                        iterator.remove();
+                    }
+                }
 
                 for (int i = 0; i < squares.size; i++) {
                     Square square = squares.get(i);
