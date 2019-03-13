@@ -10,7 +10,7 @@ public class Block2 extends Block {
         int x;
         do {
             x = MathUtils.random(0, 512 - 32);
-        } while (x % 2 != 0);
+        } while (x % 32 != 0);
         squares.add(new Square(x, 800));
     }
 
