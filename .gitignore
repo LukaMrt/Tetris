@@ -110,3 +110,8 @@ Thumbs.db
 !/ios-moe/xcode/*.xcodeproj/xcshareddata
 !/ios-moe/xcode/*.xcodeproj/project.pbxproj
 /ios-moe/xcode/native/
+\.gradle/
+
+core/out/
+
+core/src/fr/luka/tetris/test/
