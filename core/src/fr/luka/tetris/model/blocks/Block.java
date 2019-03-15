@@ -23,22 +23,22 @@ public abstract class Block {
 
     public void move(Direction direction, Array<Square> gameSquares) {
 
-        boolean cantMove = false;
+        AtomicBoolean cantMove = new AtomicBoolean(false);
 
-        for (Square square : squares) {
+        squares.forEach(square -> {
 
             square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? -32 : 32));
 
             if (cancelMove(square, gameSquares)) {
-                cantMove = true;
+                cantMove.set(true);
             }
 
-        }
+        });
 
-        if (cantMove) {
-            for (Square square : squares) {
-                square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? 32 : -32));
-            }
+        if (cantMove.get()) {
+            squares.forEach(square ->
+                    square.getRectangle().setX(
+                            square.getRectangle().getX() + (direction == Direction.LEFT ? 32 : -32)));
         }
 
     }
@@ -120,7 +120,7 @@ public abstract class Block {
 
             square.getRectangle().setY(square.getRectangle().getY() - 32);
 
-            if (square.getRectangle().y < 0) {
+            if (square.getRectangle().getY() < 0) {
                 isFallEnd.set(true);
             }
 
@@ -133,9 +133,9 @@ public abstract class Block {
         });
 
         if (isFallEnd.get()) {
-            for (Square square : squares) {
-                square.getRectangle().setY(square.getRectangle().getY() + 32);
-            }
+            squares.forEach(square ->
+                    square.getRectangle().setY(
+                            square.getRectangle().getY() + 32));
         }
 
         return isFallEnd.get();
@@ -146,7 +146,7 @@ public abstract class Block {
 
         float x = square.getRectangle().getX();
 
-        if (x < 0 || x >= 512) {
+        if (x < 0 || 512 <= x) {
             return true;
         }
 

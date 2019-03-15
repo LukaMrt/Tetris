@@ -53,25 +53,22 @@ public class Tetris extends ApplicationAdapter {
 
         updateBlock();
 
-        checksRows();
-
 		batch.begin();
 
-		for (Square square : gameSquares) {
-			batch.draw(this.square, square.getRectangle().x, square.getRectangle().y);
-		}
+		gameSquares.forEach(square -> batch.draw(this.square, square.getRectangle().x, square.getRectangle().y));
 
-		for (Square square : fallBlock.getSquares()) {
-			batch.draw(this.square, square.getRectangle().x, square.getRectangle().y);
-		}
+        fallBlock.getSquares().forEach(square -> batch.draw(this.square, square.getRectangle().x, square.getRectangle().y));
 
 		batch.end();
+
+        checksRows();
 
         checkInput();
 
 	}
 
     private void updateBlock() {
+
         if (fallBlock == null) {
 
             switch (MathUtils.random(0, 3)) {
@@ -110,9 +107,7 @@ public class Tetris extends ApplicationAdapter {
 
         if (fallBlock.fall(gameSquares)) {
 
-            for (Square square : fallBlock.getSquares()) {
-                gameSquares.add(square);
-            }
+            fallBlock.getSquares().forEach(square -> gameSquares.add(square));
 
             fallBlock = null;
 
@@ -160,8 +155,7 @@ public class Tetris extends ApplicationAdapter {
         HashMap<Float, Integer> map = new HashMap<>();
 
         // Put rows with number of square in map
-        for (Square square : gameSquares) {
-
+        gameSquares.forEach(square -> {
             float y = square.getRectangle().getY();
 
             if (!map.containsKey(y)) {
@@ -169,12 +163,10 @@ public class Tetris extends ApplicationAdapter {
             }
 
             map.replace(y, map.get(y) + 1);
-
-        }
+        });
 
         for (Map.Entry<Float, Integer> entry : map.entrySet()) {
 
-            // If line full, remove each square of this line
             if (entry.getValue().equals(16)) {
 
                 for (Iterator<Square> iterator = gameSquares.iterator(); iterator.hasNext(); ) {
