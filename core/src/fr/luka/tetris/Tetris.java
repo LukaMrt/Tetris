@@ -8,14 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Predicate;
 import com.badlogic.gdx.utils.Sort;
 import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,7 +34,7 @@ public class Tetris extends ApplicationAdapter {
 	public void create () {
 		batch = new SpriteBatch();
 		square = new Texture(Gdx.files.internal("core/assets/square.png"));
-		squares = new Array<Square>();
+		squares = new Array<>();
 	}
 
 	@Override
@@ -114,17 +112,17 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownMove + 200) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 block.move(Direction.LEFT, squares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 block.move(Direction.RIGHT, squares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 block.turn(squares);
                 coolDownMove = TimeUtils.millis();
             }
@@ -133,7 +131,7 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownFall + 75) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 fallBlock();
                 coolDownFall = TimeUtils.millis();
             }
@@ -163,8 +161,6 @@ public class Tetris extends ApplicationAdapter {
         for (Map.Entry<Float, Integer> entry : map.entrySet()) {
 
             if (entry.getValue().equals(16)) {
-
-                System.out.println("ok");
 
                 for (Iterator<Square> iterator = squares.iterator(); iterator.hasNext(); ) {
                     Square square = iterator.next();
