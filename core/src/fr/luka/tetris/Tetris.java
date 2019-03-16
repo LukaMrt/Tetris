@@ -13,65 +13,138 @@ import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Main class of programme.
+ */
 public class Tetris extends ApplicationAdapter {
 
-	private SpriteBatch batch;
-	private Texture square;
+    /**
+     * Height of the window.
+     */
+    @Getter
+    private static int windowHeight;
 
-	private Array<Square> gameSquares;
+    /**
+     * Width of the window.
+     */
+    @Getter
+    private static int windowWidth;
 
-	private Block fallBlock;
+    /**
+     * Game batch.
+     */
+    private SpriteBatch batch;
 
-	private long lastBlockFall;
+    /**
+     * Square texture.
+     */
+    private Texture square;
+
+    /**
+     * List of game squares.
+     */
+    private Array<Square> gameSquares;
+
+    /**
+     * Current block falling.
+     */
+    private Block fallBlock;
+
+    /**
+     * Last time block fell.
+     */
+    private long lastBlockFall;
+
+    /**
+     * Last time down pressed.
+     */
     private long coolDownMove;
+
+    /**
+     * Last time right/left pressed.
+     */
     private long coolDownFall;
 
-	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		square = new Texture(Gdx.files.internal("core/assets/square.png"));
-		gameSquares = new Array<>();
-        lastBlockFall = TimeUtils.millis();
-	}
+    /**
+     * Constructor.
+     *
+     * @param height : height of the window.
+     * @param width  : width of the window.
+     */
+    public Tetris(final int height, final int width) {
+        windowHeight = height;
+        windowWidth = width;
+    }
 
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        square = new Texture(Gdx.files.internal("core/assets/square.png"));
+        gameSquares = new Array<>();
+        lastBlockFall = TimeUtils.millis();
+    }
+
+    @Override
+    public void render() {
+        final float red = 0.8f;
+        final float green = 0.8f;
+        final float blue = 0.8f;
+        Gdx.gl.glClearColor(red, green, blue, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         updateBlock();
 
-        if (TimeUtils.millis() >= lastBlockFall + 1000) {
+        final int fallCoolDown = 1000;
+
+        if (TimeUtils.millis() >= lastBlockFall + fallCoolDown) {
             fallBlock();
             lastBlockFall = TimeUtils.millis();
         }
 
         updateBlock();
 
-		batch.begin();
+        batch.begin();
 
-		gameSquares.forEach(square -> batch.draw(this.square, square.getRectangle().x, square.getRectangle().y));
+        gameSquares.forEach(square
+                -> batch.draw(this.square,
+                square.getRectangle().x,
+                square.getRectangle().y));
 
-        fallBlock.getSquares().forEach(square -> batch.draw(this.square, square.getRectangle().x, square.getRectangle().y));
+        fallBlock.getSquares().forEach(square
+                -> batch.draw(this.square,
+                square.getRectangle().x,
+                square.getRectangle().y));
 
-		batch.end();
+        batch.end();
 
         checksRows();
 
         checkInput();
 
-	}
+    }
 
+    @Override
+    public void dispose() {
+        batch.dispose();
+        square.dispose();
+    }
+
+    /**
+     * Update the fallBlock with randomBlock.
+     */
     private void updateBlock() {
 
         if (fallBlock == null) {
 
-            switch (MathUtils.random(0, 3)) {
+            final int bound = 3;
+
+            switch (MathUtils.random(0, bound)) {
 
                 case 0:
                     fallBlock = new Block1();
@@ -89,6 +162,10 @@ public class Tetris extends ApplicationAdapter {
                     fallBlock = new Block4();
                     break;
 
+                default:
+                    fallBlock = new Block1();
+                    break;
+
             }
 
             lastBlockFall = TimeUtils.millis();
@@ -97,12 +174,9 @@ public class Tetris extends ApplicationAdapter {
 
     }
 
-    @Override
-	public void dispose () {
-		batch.dispose();
-		square.dispose();
-	}
-
+    /**
+     * Fall the Block.
+     */
     private void fallBlock() {
 
         if (fallBlock.fall(gameSquares)) {
@@ -115,9 +189,14 @@ public class Tetris extends ApplicationAdapter {
 
     }
 
+    /**
+     * Check if some keys or pressed and do actions.
+     */
     private void checkInput() {
 
-        if (TimeUtils.millis() > coolDownMove + 200) {
+        final int moveCoolDown = 200;
+
+        if (TimeUtils.millis() > coolDownMove + moveCoolDown) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 fallBlock.move(Direction.LEFT, gameSquares);
@@ -136,7 +215,9 @@ public class Tetris extends ApplicationAdapter {
 
         }
 
-        if (TimeUtils.millis() > coolDownFall + 75) {
+        final int fallCoolDown = 75;
+
+        if (TimeUtils.millis() > coolDownFall + fallCoolDown) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 fallBlock();
@@ -147,10 +228,15 @@ public class Tetris extends ApplicationAdapter {
 
     }
 
+    /**
+     * Check if rows are full and remove them.
+     */
     private void checksRows() {
 
-	    // Sort to have same rows next
-        Sort.instance().sort(gameSquares, (o1, o2) -> Float.compare(o1.getRectangle().getY(), o2.getRectangle().getY()));
+        // Sort to have same rows next
+        Sort.instance().sort(gameSquares, (o1, o2)
+                -> Float.compare(o1.getRectangle().getY(),
+                o2.getRectangle().getY()));
 
         HashMap<Float, Integer> map = new HashMap<>();
 
@@ -167,9 +253,9 @@ public class Tetris extends ApplicationAdapter {
 
         for (Map.Entry<Float, Integer> entry : map.entrySet()) {
 
-            if (entry.getValue().equals(16)) {
+            if (entry.getValue().equals(windowWidth / Square.WIDTH)) {
 
-                for (Iterator<Square> iterator = gameSquares.iterator(); iterator.hasNext(); ) {
+                for (Iterator<Square> iterator = gameSquares.iterator(); iterator.hasNext();) {
                     Square square = iterator.next();
                     if (square.getRectangle().getY() == entry.getKey()) {
                         iterator.remove();

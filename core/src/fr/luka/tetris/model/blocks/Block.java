@@ -3,6 +3,7 @@ package fr.luka.tetris.model.blocks;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
+import fr.luka.tetris.Tetris;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import lombok.Getter;
@@ -11,23 +12,48 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
+/**
+ * Abstract class of a block.
+ */
 public abstract class Block {
 
+    /**
+     * Height of the Window.
+     */
+    final int WINDOW_HEIGHT = Tetris.getWindowHeight();
+
+    /**
+     * Width of the Window.
+     */
+    final int WINDOW_WIDTH = Tetris.getWindowWidth();
+
+    /**
+     * Height of a square.
+     */
+    final int SQUARE_WIDTH = Square.WIDTH;
+
+    /**
+     * Array of squares which compose the block.
+     */
     @Getter
-    protected Array<Square> squares;
+    protected Array<Square> squares = new Array<>();
 
-    protected Block() {
-        squares = new Array<>();
-    }
-
-    public void move(Direction direction, Array<Square> gameSquares) {
+    /**
+     * Move the block.
+     * @param direction : RIGHT or LEFT, direction of the move.
+     * @param gameSquares : list of all squares in the game.
+     */
+    public void move(final Direction direction, final Array<Square> gameSquares) {
 
         AtomicBoolean cantMove = new AtomicBoolean(false);
 
         squares.forEach(square -> {
 
-            square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? -32 : 32));
+            square.getRectangle().setX(
+                    square.getRectangle().getX()
+                            + (direction == Direction.LEFT
+                            ? -SQUARE_WIDTH
+                            : SQUARE_WIDTH));
 
             if (cancelMove(square, gameSquares)) {
                 cantMove.set(true);
@@ -36,117 +62,116 @@ public abstract class Block {
         });
 
         if (cantMove.get()) {
-            squares.forEach(square ->
-                    square.getRectangle().setX(
-                            square.getRectangle().getX() + (direction == Direction.LEFT ? 32 : -32)));
+            squares.forEach(square -> square.getRectangle().setX(
+                    square.getRectangle().getX()
+                            + (direction == Direction.LEFT
+                            ? SQUARE_WIDTH
+                            : -SQUARE_WIDTH)));
         }
 
     }
 
-    public void turn(Array<Square> gameSquares) {
+    /**
+     * Turn the block.
+     * @param gameSquares : list of al squares in the game.
+     */
+    public void turn(final Array<Square> gameSquares) {
 
         Array<Square> rowsSort = new Array<>(squares);
 
-        Sort.instance().sort(rowsSort, (o1, o2) -> {
-            if (o1.getRectangle().getY() < o2.getRectangle().getY()) {
-                return -1;
-            } else {
-                return 1;
-            }
-        });
+        Sort.instance().sort(rowsSort, (o1, o2)
+                -> Float.compare(o1.getRectangle().getY(), o2.getRectangle().getY()));
 
         Array<Square> colSort = new Array<>(squares);
 
-        Sort.instance().sort(colSort, (o1, o2) -> {
-            if (o1.getRectangle().getX() < o2.getRectangle().getX()) {
-                return -1;
-            } else {
-                return 1;
-            }
-        });
+        Sort.instance().sort(colSort, (o1, o2)
+                -> Float.compare(o1.getRectangle().getX(), o2.getRectangle().getX()));
 
         Array<Float> rows = new Array<>();
 
-        for (Square square : squares) {
+        squares.forEach(square -> {
             float y = square.getRectangle().getY();
             if (!rows.contains(y, false)) {
                 rows.add(square.getRectangle().getY());
             }
-        }
+        });
 
         float originX = colSort.get(0).getRectangle().getX();
         float originY = rowsSort.get(0).getRectangle().getY();
 
-        boolean cantTurn = false;
+        AtomicBoolean cantTurn = new AtomicBoolean(false);
 
         Map<Square, Rectangle> map = new HashMap<>();
 
-        for (Square square : squares) {
-
+        squares.forEach(square -> {
             map.put(square, new Rectangle(square.getRectangle()));
 
-            float row = (square.getRectangle().getY() - originY) / 32;
-            float column = (square.getRectangle().getX() - originX) / 32;
+            float row = (square.getRectangle().getY() - originY) / SQUARE_WIDTH;
 
-            float newRow = column;
+            float newRow = (square.getRectangle().getX() - originX) / SQUARE_WIDTH;
             float newColumn = rows.size - (row + 1);
 
-            square.getRectangle().setY(originY + (newRow * 32));
-            square.getRectangle().setX(originX + (newColumn * 32));
+            square.getRectangle().setY(originY + (newRow * SQUARE_WIDTH));
+            square.getRectangle().setX(originX + (newColumn * SQUARE_WIDTH));
 
             if (cancelMove(square, gameSquares)) {
-                cantTurn = true;
+                cantTurn.set(true);
             }
+        });
 
-        }
-
-        if (cantTurn) {
-
-            for (Square square : squares ) {
-
-                square.setRectangle(map.get(square));
-
-            }
-
+        if (cantTurn.get()) {
+            squares.forEach(square -> square.setRectangle(map.get(square)));
         }
 
     }
 
-    public boolean fall(Array<Square> gameSquares) {
+    /**
+     * Fall the block of 1 square height.
+     * @param gameSquares : list of all squares in the game;
+     * @return true if cant fall, false else.
+     */
+    public boolean fall(final Array<Square> gameSquares) {
 
         AtomicBoolean isFallEnd = new AtomicBoolean(false);
 
         squares.forEach(square -> {
 
-            square.getRectangle().setY(square.getRectangle().getY() - 32);
+            square.getRectangle().setY(
+                    square.getRectangle().getY() - SQUARE_WIDTH);
 
             if (square.getRectangle().getY() < 0) {
                 isFallEnd.set(true);
             }
 
-            for (Square square1 : gameSquares) {
+            gameSquares.forEach(square1 -> {
                 if (square.getRectangle().overlaps(square1.getRectangle())) {
                     isFallEnd.set(true);
                 }
-            }
+            });
 
         });
 
         if (isFallEnd.get()) {
             squares.forEach(square ->
                     square.getRectangle().setY(
-                            square.getRectangle().getY() + 32));
+                            square.getRectangle().getY() + SQUARE_WIDTH));
         }
 
         return isFallEnd.get();
 
     }
 
-    private boolean cancelMove(Square square, Array<Square> gameSquares) {
+    /**
+     * Check if the move is possible (move or turn).
+     * @param square : the current square.
+     * @param gameSquares : list of all squares in the game.
+     * @return true if the move is impossible, false else.
+     */
+    private boolean cancelMove(final Square square, final Array<Square> gameSquares) {
 
         float x = square.getRectangle().getX();
 
-        if (x < 0 || 512 <= x) {
+        if (x < 0 || WINDOW_WIDTH <= x) {
             return true;
         }
 
