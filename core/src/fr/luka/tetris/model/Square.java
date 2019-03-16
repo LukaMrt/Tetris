@@ -24,12 +24,8 @@ public class Square {
 
         Square square = (Square) o;
 
-        float thisX = rectangle.getX();
-        float thisY = rectangle.getY();
-        float oX = square.rectangle.getX();
-        float oY = square.rectangle.getY();
-
-        return (thisX == oX) && (thisY == oY);
+        return (rectangle.getX() == square.getRectangle().getX())
+                && (rectangle.getY() == square.getRectangle().getY());
 
     }
 
@@ -44,14 +40,6 @@ public class Square {
             }
         });
 
-    }
-
-    public Rectangle getRectangle() {
-        return rectangle;
-    }
-
-    public void setRectangle(Rectangle rectangle) {
-        this.rectangle = rectangle;
     }
 
 }

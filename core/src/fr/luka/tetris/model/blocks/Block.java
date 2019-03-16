@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public abstract class Block {
@@ -16,58 +17,28 @@ public abstract class Block {
     @Getter
     protected Array<Square> squares;
 
-    public Block() {
-        squares = new Array<Square>();
-    }
-
-    public boolean fall(Array<Square> gameSquares) {
-
-        boolean isFallEnd = false;
-
-        for (Square square : squares) {
-
-            square.getRectangle().setY(square.getRectangle().getY() - 32);
-
-            if (square.getRectangle().y < 0) {
-                isFallEnd = true;
-            }
-
-            for (Square square1 : gameSquares) {
-                if (square.getRectangle().overlaps(square1.getRectangle())) {
-                    isFallEnd = true;
-                }
-            }
-
-        }
-
-        if (isFallEnd) {
-            for (Square square : squares) {
-                square.getRectangle().setY(square.getRectangle().getY() + 32);
-            }
-        }
-
-        return isFallEnd;
-
+    protected Block() {
+        squares = new Array<>();
     }
 
     public void move(Direction direction, Array<Square> gameSquares) {
 
-        boolean cantMove = false;
+        AtomicBoolean cantMove = new AtomicBoolean(false);
 
-        for (Square square : squares) {
+        squares.forEach(square -> {
 
             square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? -32 : 32));
 
             if (cancelMove(square, gameSquares)) {
-                cantMove = true;
+                cantMove.set(true);
             }
 
-        }
+        });
 
-        if (cantMove) {
-            for (Square square : squares) {
-                square.getRectangle().setX(square.getRectangle().getX() + (direction == Direction.LEFT ? 32 : -32));
-            }
+        if (cantMove.get()) {
+            squares.forEach(square ->
+                    square.getRectangle().setX(
+                            square.getRectangle().getX() + (direction == Direction.LEFT ? 32 : -32)));
         }
 
     }
@@ -141,11 +112,41 @@ public abstract class Block {
 
     }
 
+    public boolean fall(Array<Square> gameSquares) {
+
+        AtomicBoolean isFallEnd = new AtomicBoolean(false);
+
+        squares.forEach(square -> {
+
+            square.getRectangle().setY(square.getRectangle().getY() - 32);
+
+            if (square.getRectangle().getY() < 0) {
+                isFallEnd.set(true);
+            }
+
+            for (Square square1 : gameSquares) {
+                if (square.getRectangle().overlaps(square1.getRectangle())) {
+                    isFallEnd.set(true);
+                }
+            }
+
+        });
+
+        if (isFallEnd.get()) {
+            squares.forEach(square ->
+                    square.getRectangle().setY(
+                            square.getRectangle().getY() + 32));
+        }
+
+        return isFallEnd.get();
+
+    }
+
     private boolean cancelMove(Square square, Array<Square> gameSquares) {
 
         float x = square.getRectangle().getX();
 
-        if (x < 0 || x >= 512) {
+        if (x < 0 || 512 <= x) {
             return true;
         }
 
@@ -159,7 +160,4 @@ public abstract class Block {
 
     }
 
-    public Array<Square> getSquares() {
-        return squares;
-    }
 }
