@@ -2,13 +2,41 @@ package fr.luka.tetris.enums;
 
 import com.badlogic.gdx.math.MathUtils;
 
+/**
+ * Enumeration with the different blocks.
+ */
 public enum BlockType {
 
+    /**
+     * Block with 4 squares.
+     * --
+     * --
+     */
     BLOCK1,
+
+    /**
+     * Block with 1 square.
+     * -
+     */
     BLOCK2,
+
+    /**
+     * Block with 3 squares.
+     * ---
+     */
     BLOCK3,
+    /**
+     * Block with 4 squares.
+     * --
+     * -
+     * -
+     */
     BLOCK4;
 
+    /**
+     * Get a random BlockType.
+     * @return a random BlockType.
+     */
     public static BlockType getRandomType() {
 
         switch (MathUtils.random(0, 3)) {

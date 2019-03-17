@@ -4,10 +4,21 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import fr.luka.tetris.enums.BlockType;
 
+/**
+ * Block Factory.
+ * Class which create .locks.
+ */
 public class BlockFactory {
 
-    private Array<String> paths = new Array<String>();
+    /**
+     * Array which contains the textures paths.
+     */
+    private Array<String> paths = new Array<>();
 
+    /**
+     * Constructor.
+     * Init the textures paths.
+     */
     public BlockFactory() {
         paths.add("core/assets/blueSquare.png",
                 "core/assets/graySquare.png",
@@ -15,6 +26,11 @@ public class BlockFactory {
                 "core/assets/redSquare.png");
     }
 
+    /**
+     * Get a block from a blockType.
+     * @param blockType the type of the block
+     * @return Block, the block associated with blockType.
+     */
     public Block getBlock(BlockType blockType) {
 
         int index = MathUtils.random(0, paths.size - 1);
