@@ -1,6 +1,8 @@
 package fr.luka.tetris.model.blocks;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import fr.luka.tetris.model.Square;
 
 /**
@@ -15,18 +17,22 @@ public class Block4 extends Block {
      * Constructor.
      * Init random first position and add square to superClass.
      */
-    public Block4() {
+    public Block4(String texturePath) {
         int x;
 
         do {
-            x = MathUtils.random(0, WINDOW_WIDTH - SQUARE_WIDTH * 2);
-        } while (x % SQUARE_WIDTH != 0);
+            x = MathUtils.random(0, WINDOW_WIDTH - SQUARE_SIZE * 2);
+        } while (x % SQUARE_SIZE != 0);
 
-        squares.add(
-                new Square(x, WINDOW_HEIGHT),
-                new Square(x + SQUARE_WIDTH, WINDOW_HEIGHT),
-                new Square(x, WINDOW_HEIGHT + SQUARE_WIDTH),
-                new Square(x, WINDOW_HEIGHT + SQUARE_WIDTH * 2)
+        Array<Rectangle> array = new Array<>();
+
+        array.add(
+                new Rectangle(x, WINDOW_HEIGHT, SQUARE_SIZE, SQUARE_SIZE),
+                new Rectangle(x + SQUARE_SIZE, WINDOW_HEIGHT, SQUARE_SIZE, SQUARE_SIZE),
+                new Rectangle(x, WINDOW_HEIGHT + SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE),
+                new Rectangle(x, WINDOW_HEIGHT + SQUARE_SIZE * 2, SQUARE_SIZE, SQUARE_SIZE)
         );
+
+        super.create(array, texturePath);
     }
 }

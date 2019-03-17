@@ -9,10 +9,10 @@ import fr.luka.tetris.Tetris;
  */
 public final class DesktopLauncher {
 
-/**
- * Height of the window.
- */
-private static final int HEIGHT = 800;
+	/**
+	 * Height of the window.
+	 */
+	private static final int HEIGHT = 800;
 
 	/**
 	 * Width of the window.

@@ -4,12 +4,11 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
 import com.badlogic.gdx.utils.TimeUtils;
+import fr.luka.tetris.enums.BlockType;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
@@ -42,11 +41,6 @@ public class Tetris extends ApplicationAdapter {
     private SpriteBatch batch;
 
     /**
-     * Square texture.
-     */
-    private Texture square;
-
-    /**
      * List of game squares.
      */
     private Array<Square> gameSquares;
@@ -72,6 +66,11 @@ public class Tetris extends ApplicationAdapter {
     private long coolDownFall;
 
     /**
+     * Block factory which create blocks.
+     */
+    private BlockFactory blockFactory;
+
+    /**
      * Constructor.
      *
      * @param height : height of the window.
@@ -85,8 +84,8 @@ public class Tetris extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        square = new Texture(Gdx.files.internal("core/assets/square.png"));
         gameSquares = new Array<>();
+        blockFactory = new BlockFactory();
         lastBlockFall = TimeUtils.millis();
     }
 
@@ -112,12 +111,12 @@ public class Tetris extends ApplicationAdapter {
         batch.begin();
 
         gameSquares.forEach(square
-                -> batch.draw(this.square,
+                -> batch.draw(square.getTexture(),
                 square.getRectangle().x,
                 square.getRectangle().y));
 
         fallBlock.getSquares().forEach(square
-                -> batch.draw(this.square,
+                -> batch.draw(square.getTexture(),
                 square.getRectangle().x,
                 square.getRectangle().y));
 
@@ -132,7 +131,6 @@ public class Tetris extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
-        square.dispose();
     }
 
     /**
@@ -142,31 +140,7 @@ public class Tetris extends ApplicationAdapter {
 
         if (fallBlock == null) {
 
-            final int bound = 3;
-
-            switch (MathUtils.random(0, bound)) {
-
-                case 0:
-                    fallBlock = new Block1();
-                    break;
-
-                case 1:
-                    fallBlock = new Block2();
-                    break;
-
-                case 2:
-                    fallBlock = new Block3();
-                    break;
-
-                case 3:
-                    fallBlock = new Block4();
-                    break;
-
-                default:
-                    fallBlock = new Block1();
-                    break;
-
-            }
+            fallBlock = blockFactory.getBlock(BlockType.getRandomType());
 
             lastBlockFall = TimeUtils.millis();
 
@@ -253,7 +227,7 @@ public class Tetris extends ApplicationAdapter {
 
         for (Map.Entry<Float, Integer> entry : map.entrySet()) {
 
-            if (entry.getValue().equals(windowWidth / Square.WIDTH)) {
+            if (entry.getValue().equals(windowWidth / Square.SIZE)) {
 
                 for (Iterator<Square> iterator = gameSquares.iterator(); iterator.hasNext();) {
                     Square square = iterator.next();
