@@ -10,7 +10,7 @@ public class BlockFactory {
 
     public BlockFactory() {
         paths.add("core/assets/blueSquare.png",
-                "core/assets/graySquare.png,",
+                "core/assets/graySquare.png",
                 "core/assets/greenSquare.png",
                 "core/assets/redSquare.png");
     }

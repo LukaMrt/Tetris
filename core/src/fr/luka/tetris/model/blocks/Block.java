@@ -1,5 +1,6 @@
 package fr.luka.tetris.model.blocks;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
@@ -8,6 +9,7 @@ import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import lombok.Getter;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -156,8 +158,14 @@ public abstract class Block {
         });
 
         if (isFallEnd.get()) {
-            squares.forEach(square ->
-                    square.getRectangle().setY(
+
+            Sort.instance().sort(squares, (o1, o2) -> Float.compare(o1.getRectangle().getY(), o2.getRectangle().getY()));
+
+            if (squares.get(squares.size - 1).getRectangle().getY() + SQUARE_SIZE > 800) {
+                Gdx.app.exit();
+            }
+
+            squares.forEach(square -> square.getRectangle().setY(
                             square.getRectangle().getY() + SQUARE_SIZE));
         }
 
