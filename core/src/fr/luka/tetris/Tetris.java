@@ -14,6 +14,7 @@ import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
 import lombok.Getter;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -71,6 +72,11 @@ public class Tetris extends ApplicationAdapter {
     private BlockFactory blockFactory;
 
     /**
+     * Time at game start in millis.
+     */
+    private final long timeStart;
+
+    /**
      * Constructor.
      *
      * @param height : height of the window.
@@ -79,6 +85,7 @@ public class Tetris extends ApplicationAdapter {
     public Tetris(final int height, final int width) {
         windowHeight = height;
         windowWidth = width;
+        timeStart = TimeUtils.millis();
     }
 
     @Override
@@ -99,9 +106,10 @@ public class Tetris extends ApplicationAdapter {
 
         updateBlock();
 
-        final int fallCoolDown = 1000;
+        double fallCoolDown = -0.005 * (TimeUtils.millis() - timeStart) + 1_000;
+        fallCoolDown = fallCoolDown < 300 ? 300 : fallCoolDown;
 
-        if (TimeUtils.millis() >= lastBlockFall + fallCoolDown) {
+        if (TimeUtils.millis() >= lastBlockFall + fallCoolDown ) {
             fallBlock();
             lastBlockFall = TimeUtils.millis();
         }

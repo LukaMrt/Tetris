@@ -1,7 +1,7 @@
 # TETRIS game
 
 This is my Tetris game and my first project with libGDX.\
-It is a simple game with just the game screen, more in future release !
+It is a simple game with just the game screen, more in future releases !
 
 ## Getting started
 
