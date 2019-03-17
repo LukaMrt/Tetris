@@ -1,5 +1,7 @@
 package fr.luka.tetris.model;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import lombok.Getter;
@@ -12,33 +14,34 @@ import lombok.Setter;
 public class Square {
 
     /**
+     * Width of a square.
+     */
+    public static final int SIZE = 32;
+
+    /**
      * Rectangle with size 32/32.
      * Represents the location of the square.
      */
     @Getter @Setter
     private Rectangle rectangle;
 
-    /**
-     * Height of a square.
-     */
-    public static final int HEIGHT = 32;
 
     /**
-     * Width of a square.
+     * Textures of the square
      */
-    public static final int WIDTH = 32;
+    @Getter
+    private final Texture texture;
 
     /**
      * Constructor.
-     * @param x : x location of the square.
-     * @param y : y location of the square.
+     * @param rectangle : the rectangle of the square.
      */
-    public Square(final int x, final int y) {
-        rectangle = new Rectangle(x, y, WIDTH, HEIGHT);
+    public Square(Rectangle rectangle, String texturePath) {
+        this.rectangle = rectangle;
+        this.texture = new Texture(Gdx.files.internal(texturePath));
     }
 
     /**
-     * Equals method override.
      * Compare location of an other Square.
      * @param otherSquare : an other square to compare with this.
      * @return true if the square location is same as other square, false else.
@@ -57,7 +60,7 @@ public class Square {
     public void update(final Array<Square> gameSquares) {
 
         float origin = rectangle.getY();
-        rectangle.setY(origin - HEIGHT);
+        rectangle.setY(origin - SIZE);
 
         gameSquares.forEach(square -> {
             if (rectangle.overlaps(square.getRectangle())

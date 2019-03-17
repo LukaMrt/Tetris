@@ -20,23 +20,27 @@ public abstract class Block {
     /**
      * Height of the Window.
      */
-    final int WINDOW_HEIGHT = Tetris.getWindowHeight();
+    protected final int WINDOW_HEIGHT = Tetris.getWindowHeight();
 
     /**
      * Width of the Window.
      */
-    final int WINDOW_WIDTH = Tetris.getWindowWidth();
+    protected final int WINDOW_WIDTH = Tetris.getWindowWidth();
 
     /**
      * Height of a square.
      */
-    final int SQUARE_WIDTH = Square.WIDTH;
+    protected final int SQUARE_SIZE = Square.SIZE;
 
     /**
      * Array of squares which compose the block.
      */
     @Getter
     protected Array<Square> squares = new Array<>();
+
+    public void create(Array<Rectangle> array, String texturePath) {
+        array.forEach(rectangle -> squares.add(new Square(rectangle, texturePath)));
+    }
 
     /**
      * Move the block.
@@ -52,8 +56,8 @@ public abstract class Block {
             square.getRectangle().setX(
                     square.getRectangle().getX()
                             + (direction == Direction.LEFT
-                            ? -SQUARE_WIDTH
-                            : SQUARE_WIDTH));
+                            ? -SQUARE_SIZE
+                            : SQUARE_SIZE));
 
             if (cancelMove(square, gameSquares)) {
                 cantMove.set(true);
@@ -65,8 +69,8 @@ public abstract class Block {
             squares.forEach(square -> square.getRectangle().setX(
                     square.getRectangle().getX()
                             + (direction == Direction.LEFT
-                            ? SQUARE_WIDTH
-                            : -SQUARE_WIDTH)));
+                            ? SQUARE_SIZE
+                            : -SQUARE_SIZE)));
         }
 
     }
@@ -106,13 +110,13 @@ public abstract class Block {
         squares.forEach(square -> {
             map.put(square, new Rectangle(square.getRectangle()));
 
-            float row = (square.getRectangle().getY() - originY) / SQUARE_WIDTH;
+            float row = (square.getRectangle().getY() - originY) / SQUARE_SIZE;
 
-            float newRow = (square.getRectangle().getX() - originX) / SQUARE_WIDTH;
+            float newRow = (square.getRectangle().getX() - originX) / SQUARE_SIZE;
             float newColumn = rows.size - (row + 1);
 
-            square.getRectangle().setY(originY + (newRow * SQUARE_WIDTH));
-            square.getRectangle().setX(originX + (newColumn * SQUARE_WIDTH));
+            square.getRectangle().setY(originY + (newRow * SQUARE_SIZE));
+            square.getRectangle().setX(originX + (newColumn * SQUARE_SIZE));
 
             if (cancelMove(square, gameSquares)) {
                 cantTurn.set(true);
@@ -137,7 +141,7 @@ public abstract class Block {
         squares.forEach(square -> {
 
             square.getRectangle().setY(
-                    square.getRectangle().getY() - SQUARE_WIDTH);
+                    square.getRectangle().getY() - SQUARE_SIZE);
 
             if (square.getRectangle().getY() < 0) {
                 isFallEnd.set(true);
@@ -154,7 +158,7 @@ public abstract class Block {
         if (isFallEnd.get()) {
             squares.forEach(square ->
                     square.getRectangle().setY(
-                            square.getRectangle().getY() + SQUARE_WIDTH));
+                            square.getRectangle().getY() + SQUARE_SIZE));
         }
 
         return isFallEnd.get();

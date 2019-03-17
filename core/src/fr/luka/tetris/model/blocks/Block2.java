@@ -1,6 +1,8 @@
 package fr.luka.tetris.model.blocks;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import fr.luka.tetris.model.Square;
 
 /**
@@ -13,14 +15,18 @@ public class Block2 extends Block {
      * Constructor.
      * Init random first position and add square to superClass.
      */
-    public Block2() {
+    public Block2(String texturePath) {
         int x;
 
         do {
-            x = MathUtils.random(0, WINDOW_WIDTH - SQUARE_WIDTH);
-        } while (x % SQUARE_WIDTH != 0);
+            x = MathUtils.random(0, WINDOW_WIDTH - SQUARE_SIZE);
+        } while (x % SQUARE_SIZE != 0);
 
-        squares.add(new Square(x, WINDOW_HEIGHT));
+        Array<Rectangle> array = new Array<>();
+
+        array.add(new Rectangle(x, WINDOW_HEIGHT, SQUARE_SIZE, SQUARE_SIZE));
+
+        super.create(array, texturePath);
     }
 
 }
