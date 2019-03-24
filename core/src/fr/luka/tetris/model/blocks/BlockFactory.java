@@ -20,10 +20,10 @@ public class BlockFactory {
      * Init the textures paths.
      */
     public BlockFactory() {
-        paths.add("core/assets/blueSquare.png",
-                "core/assets/graySquare.png",
-                "core/assets/greenSquare.png",
-                "core/assets/redSquare.png");
+        paths.add("blueSquare.png",
+                "graySquare.png",
+                "greenSquare.png",
+                "redSquare.png");
     }
 
     /**
