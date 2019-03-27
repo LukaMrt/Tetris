@@ -14,7 +14,6 @@ import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
 import lombok.Getter;
 
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -180,17 +179,17 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownMove + moveCoolDown) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.Q) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 fallBlock.move(Direction.LEFT, gameSquares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 fallBlock.move(Direction.RIGHT, gameSquares);
                 coolDownMove = TimeUtils.millis();
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.Z) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 fallBlock.turn(gameSquares);
                 coolDownMove = TimeUtils.millis();
             }
@@ -201,7 +200,7 @@ public class Tetris extends ApplicationAdapter {
 
         if (TimeUtils.millis() > coolDownFall + fallCoolDown) {
 
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 fallBlock();
                 coolDownFall = TimeUtils.millis();
             }
