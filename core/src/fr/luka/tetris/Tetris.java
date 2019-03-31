@@ -213,11 +213,10 @@ public class Tetris extends ApplicationAdapter {
      * Check if rows are full and remove them.
      */
     private void checksRows() {
-
-        // Sort to have same rows next
         Sort.instance().sort(gameSquares, (o1, o2)
                 -> Float.compare(o1.getRectangle().getY(),
                 o2.getRectangle().getY()));
+
 
         HashMap<Float, Integer> map = new HashMap<>();
 
@@ -244,7 +243,15 @@ public class Tetris extends ApplicationAdapter {
                 }
 
                 for (int i = 0; i < gameSquares.size; i++) {
-                    gameSquares.get(i).update(gameSquares);
+
+                    Square square = gameSquares.get(i);
+
+                    boolean update;
+
+                    do {
+                        update = square.update(gameSquares);
+                    } while (update);
+
                 }
 
                 checksRows();
