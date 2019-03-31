@@ -135,6 +135,8 @@ public class Tetris extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+        gameSquares.forEach(square -> square.getTexture().dispose());
+        fallBlock.getSquares().forEach(square -> square.getTexture().dispose());
     }
 
     /**
@@ -211,52 +213,6 @@ public class Tetris extends ApplicationAdapter {
      */
     private void checksRows() {
 
-        /* Sort.instance().sort(gameSquares, (o1, o2)
-                -> Float.compare(o1.getRectangle().getY(),
-                o2.getRectangle().getY()));
-
-
-        HashMap<Float, Integer> map = new HashMap<>();
-
-        // Put rows with number of square in map
-        gameSquares.forEach(square -> {
-            float y = square.getRectangle().getY();
-
-            if (!map.containsKey(y)) {
-                map.put(y, 0);
-            }
-
-            map.replace(y, map.get(y) + 1);
-        });
-
-        for (Map.Entry<Float, Integer> entry : map.entrySet()) {
-
-            if (entry.getValue().equals(windowWidth / Square.SIZE)) {
-
-                for (Iterator<Square> iterator = gameSquares.iterator(); iterator.hasNext();) {
-                    Square square = iterator.next();
-                    if (square.getRectangle().getY() == entry.getKey()) {
-                        iterator.remove();
-                    }
-                }
-
-                for (int i = 0; i < gameSquares.size; i++) {
-
-                    Square square = gameSquares.get(i);
-
-                    boolean update;
-
-                    do {
-                        update = square.update(gameSquares);
-                    } while (update);
-
-                }
-
-                checksRows();
-                break;
-
-            }*/
-
         Map<Float, Block> map = new TreeMap<>(Float::compare);
 
         // Put rows with number of square in map
@@ -275,6 +231,7 @@ public class Tetris extends ApplicationAdapter {
 
             if (block.getSquares().size != windowWidth / Square.SIZE) return;
 
+            block.getSquares().forEach(square -> square.getTexture().dispose());
             gameSquares.removeAll(block.getSquares(), true);
 
             map.keySet().stream().filter(key -> !key.equals(y)).forEach(key -> {
