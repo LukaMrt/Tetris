@@ -22,11 +22,8 @@ public class Block2 extends Block {
             x = MathUtils.random(0, WINDOW_WIDTH - SQUARE_SIZE);
         } while (x % SQUARE_SIZE != 0);
 
-        Array<Rectangle> array = new Array<>();
+        squares.add(new Square(new Rectangle(x, WINDOW_HEIGHT, SQUARE_SIZE, SQUARE_SIZE), texturePath));
 
-        array.add(new Rectangle(x, WINDOW_HEIGHT, SQUARE_SIZE, SQUARE_SIZE));
-
-        super.create(array, texturePath);
     }
 
 }

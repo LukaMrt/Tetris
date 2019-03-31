@@ -1,6 +1,7 @@
 package fr.luka.tetris.model.blocks;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import fr.luka.tetris.enums.BlockType;
 
@@ -50,7 +51,7 @@ public class BlockFactory {
                 return new Block4(paths.get(index));
 
             default:
-                return new Block1(paths.get(index));
+                return new EmptyBlock();
 
         }
 

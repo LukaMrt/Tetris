@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Sort;
 import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.enums.BlockType;
 import fr.luka.tetris.enums.Direction;
@@ -14,9 +13,7 @@ import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Main class of programme.
@@ -213,7 +210,8 @@ public class Tetris extends ApplicationAdapter {
      * Check if rows are full and remove them.
      */
     private void checksRows() {
-        Sort.instance().sort(gameSquares, (o1, o2)
+
+        /* Sort.instance().sort(gameSquares, (o1, o2)
                 -> Float.compare(o1.getRectangle().getY(),
                 o2.getRectangle().getY()));
 
@@ -257,9 +255,36 @@ public class Tetris extends ApplicationAdapter {
                 checksRows();
                 break;
 
+            }*/
+
+        Map<Float, Block> map = new TreeMap<>(Float::compare);
+
+        // Put rows with number of square in map
+        gameSquares.forEach(square -> {
+            float y = square.getRectangle().getY();
+
+            if (!map.containsKey(y)) {
+                map.put(y, blockFactory.getBlock(BlockType.BLOCKNULL));
             }
 
-        }
+            map.get(y).getSquares().add(square);
+        });
+
+        map.forEach((y, block) -> {
+
+
+            if (block.getSquares().size != windowWidth / Square.SIZE) return;
+
+            gameSquares.removeAll(block.getSquares(), true);
+
+            map.keySet().stream().filter(key -> !key.equals(y)).forEach(key -> {
+                boolean fallEnd;
+                do {
+                    fallEnd = map.get(key).fall(gameSquares);
+                } while (!fallEnd);
+            } );
+
+        });
 
     }
 

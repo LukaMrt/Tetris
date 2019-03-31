@@ -25,13 +25,19 @@ public enum BlockType {
      * ---
      */
     BLOCK3,
+
     /**
      * Block with 4 squares.
      * --
      * -
      * -
      */
-    BLOCK4;
+    BLOCK4,
+
+    /**
+     * An empty block.
+     */
+    BLOCKNULL;
 
     /**
      * Get a random BlockType.
@@ -54,7 +60,7 @@ public enum BlockType {
                 return BLOCK4;
 
             default:
-                return BLOCK1;
+                return BLOCKNULL;
 
         }
 
