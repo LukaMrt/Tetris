@@ -40,10 +40,6 @@ public abstract class Block {
     @Getter
     protected Array<Square> squares = new Array<>();
 
-    public void create(Array<Rectangle> array, String texturePath) {
-        array.forEach(rectangle -> squares.add(new Square(rectangle, texturePath)));
-    }
-
     /**
      * Move the block.
      * @param direction : RIGHT or LEFT, direction of the move.
@@ -142,15 +138,14 @@ public abstract class Block {
 
         squares.forEach(square -> {
 
-            square.getRectangle().setY(
-                    square.getRectangle().getY() - SQUARE_SIZE);
+            square.getRectangle().setY(square.getRectangle().getY() - SQUARE_SIZE);
 
             if (square.getRectangle().getY() < 0) {
                 isFallEnd.set(true);
             }
 
             gameSquares.forEach(square1 -> {
-                if (square.getRectangle().overlaps(square1.getRectangle())) {
+                if (square != square1 && square.getRectangle().overlaps(square1.getRectangle())) {
                     isFallEnd.set(true);
                 }
             });
@@ -165,8 +160,8 @@ public abstract class Block {
                 Gdx.app.exit();
             }
 
-            squares.forEach(square -> square.getRectangle().setY(
-                            square.getRectangle().getY() + SQUARE_SIZE));
+            squares.forEach(
+                    square -> square.getRectangle().setY(square.getRectangle().getY() + SQUARE_SIZE));
         }
 
         return isFallEnd.get();
