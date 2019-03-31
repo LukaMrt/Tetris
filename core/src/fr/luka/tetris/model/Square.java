@@ -57,18 +57,31 @@ public class Square {
      * Fall the square and check if it is possible, cancel if it isn't.
      * @param gameSquares : all squares in the game.
      */
-    public void update(final Array<Square> gameSquares) {
+    public boolean update(final Array<Square> gameSquares) {
 
         float origin = rectangle.getY();
         rectangle.setY(origin - SIZE);
 
-        gameSquares.forEach(square -> {
-            if (rectangle.overlaps(square.getRectangle())
-                    && !square.compare(this)) {
+        for (Square square : gameSquares) {
+
+            if (square != this && rectangle.overlaps(square.rectangle)) {
+
                 rectangle.setY(origin);
+                return false;
+
             }
-        });
+
+        }
+
+
+        if (rectangle.getY() < 0) {
+            rectangle.setY(origin);
+            return false;
+        }
+
+        return true;
 
     }
+
 
 }
