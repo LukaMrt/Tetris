@@ -9,11 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.enums.BlockType;
 import fr.luka.tetris.enums.Direction;
+import fr.luka.tetris.model.RowsChecker;
 import fr.luka.tetris.model.Square;
 import fr.luka.tetris.model.blocks.*;
 import lombok.Getter;
-
-import java.util.*;
 
 /**
  * Main class of programme.
@@ -46,11 +45,6 @@ public class Tetris extends ApplicationAdapter {
      * Current block falling.
      */
     private Block fallBlock;
-
-    /**
-     * Last time block fell.
-     */
-    private long lastBlockFall;
 
     /**
      * Last time down pressed.
@@ -89,28 +83,23 @@ public class Tetris extends ApplicationAdapter {
         batch = new SpriteBatch();
         gameSquares = new Array<>();
         blockFactory = new BlockFactory();
-        lastBlockFall = TimeUtils.millis();
     }
 
     @Override
     public void render() {
-        final float red = 0.8f;
-        final float green = 0.8f;
-        final float blue = 0.8f;
-        Gdx.gl.glClearColor(red, green, blue, 1);
+        Gdx.gl.glClearColor(0.8f, 0.8f, 0.8f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        updateBlock();
+        double actualCoolDown = -0.005 * (TimeUtils.millis() - timeStart) + 1_000;
+        actualCoolDown = actualCoolDown < 300 ? 300 : actualCoolDown;
 
-        double fallCoolDown = -0.005 * (TimeUtils.millis() - timeStart) + 1_000;
-        fallCoolDown = fallCoolDown < 300 ? 300 : fallCoolDown;
-
-        if (TimeUtils.millis() >= lastBlockFall + fallCoolDown ) {
-            fallBlock();
-            lastBlockFall = TimeUtils.millis();
+        if (this.fallBlock != null && TimeUtils.millis() >= this.fallBlock.getLastFall() + actualCoolDown ) {
+            this.fallBlock = this.fallBlock.fall(this.gameSquares);
         }
 
-        updateBlock();
+        if (fallBlock == null) {
+            fallBlock = blockFactory.getBlock(BlockType.getRandomType());
+        }
 
         batch.begin();
 
@@ -126,7 +115,7 @@ public class Tetris extends ApplicationAdapter {
 
         batch.end();
 
-        checksRows();
+        new RowsChecker(this.gameSquares).check();
 
         checkInput();
 
@@ -137,36 +126,6 @@ public class Tetris extends ApplicationAdapter {
         batch.dispose();
         gameSquares.forEach(square -> square.getTexture().dispose());
         fallBlock.getSquares().forEach(square -> square.getTexture().dispose());
-    }
-
-    /**
-     * Update the fallBlock with randomBlock.
-     */
-    private void updateBlock() {
-
-        if (fallBlock == null) {
-
-            fallBlock = blockFactory.getBlock(BlockType.getRandomType());
-
-            lastBlockFall = TimeUtils.millis();
-
-        }
-
-    }
-
-    /**
-     * Fall the Block.
-     */
-    private void fallBlock() {
-
-        if (fallBlock.fall(gameSquares)) {
-
-            fallBlock.getSquares().forEach(square -> gameSquares.add(square));
-
-            fallBlock = null;
-
-        }
-
     }
 
     /**
@@ -195,53 +154,14 @@ public class Tetris extends ApplicationAdapter {
 
         }
 
-        final int fallCoolDown = 75;
-
-        if (TimeUtils.millis() > coolDownFall + fallCoolDown) {
+        if (TimeUtils.millis() > coolDownFall + 75) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                fallBlock();
+                this.fallBlock = this.fallBlock.fall(this.gameSquares);
                 coolDownFall = TimeUtils.millis();
             }
 
         }
-
-    }
-
-    /**
-     * Check if rows are full and remove them.
-     */
-    private void checksRows() {
-
-        Map<Float, Block> map = new TreeMap<>(Float::compare);
-
-        // Put rows with number of square in map
-        gameSquares.forEach(square -> {
-            float y = square.getRectangle().getY();
-
-            if (!map.containsKey(y)) {
-                map.put(y, blockFactory.getBlock(BlockType.BLOCKNULL));
-            }
-
-            map.get(y).getSquares().add(square);
-        });
-
-        map.forEach((y, block) -> {
-
-
-            if (block.getSquares().size != windowWidth / Square.SIZE) return;
-
-            block.getSquares().forEach(square -> square.getTexture().dispose());
-            gameSquares.removeAll(block.getSquares(), true);
-
-            map.keySet().stream().filter(key -> !key.equals(y)).forEach(key -> {
-                boolean fallEnd;
-                do {
-                    fallEnd = map.get(key).fall(gameSquares);
-                } while (!fallEnd);
-            } );
-
-        });
 
     }
 

@@ -4,12 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Sort;
+import com.badlogic.gdx.utils.TimeUtils;
 import fr.luka.tetris.Tetris;
 import fr.luka.tetris.enums.Direction;
 import fr.luka.tetris.model.Square;
 import lombok.Getter;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,6 +39,9 @@ public abstract class Block {
      */
     @Getter
     protected Array<Square> squares = new Array<>();
+
+    @Getter
+    private double lastFall;
 
     /**
      * Move the block.
@@ -132,7 +135,9 @@ public abstract class Block {
      * @param gameSquares : list of all squares in the game;
      * @return true if cant fall, false else.
      */
-    public boolean fall(final Array<Square> gameSquares) {
+    public Block fall(final Array<Square> gameSquares) {
+
+        this.lastFall = TimeUtils.millis();
 
         AtomicBoolean isFallEnd = new AtomicBoolean(false);
 
@@ -164,7 +169,12 @@ public abstract class Block {
                     square -> square.getRectangle().setY(square.getRectangle().getY() + SQUARE_SIZE));
         }
 
-        return isFallEnd.get();
+        if (isFallEnd.get()) {
+            gameSquares.addAll(this.squares);
+            return null;
+        }
+
+        return this;
 
     }
 
